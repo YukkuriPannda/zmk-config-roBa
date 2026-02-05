@@ -4,6 +4,7 @@
 #include <dt-bindings/zmk/pointing.h>
 
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 80
+
 &mt {
     flavor = "balanced";
     quick-tap-ms = <0>;
@@ -74,13 +75,15 @@
             #binding-cells = <2>;
             tapping-term-ms = <200>;
         };
+
         encoder_msc_down_up: encoder_msc_down_up {
-           compatible = "zmk,behavior-sensor-rotate";
-           label = "ENCODER_MSC_DOWN_UP";
-           #sensor-binding-cells = <0>;
-           bindings = <&msc SCRL_DOWN>, <&msc SCRL_UP>;
-           tap-ms = <20>;
-       };
+            compatible = "zmk,behavior-sensor-rotate";
+            label = "ENCODER_MSC_DOWN_UP";
+            #sensor-binding-cells = <0>;
+            bindings = <&msc SCRL_DOWN>, <&msc SCRL_UP>;
+
+            tap-ms = <20>;
+        };
     };
 
     keymap {
@@ -89,13 +92,12 @@
         default_layer {
             bindings = <
 &kp Q             &kp W         &kp E         &kp R        &kp T                                          &kp Y          &kp U  &lt 5 I    &kp O    &kp P
-&kp A             &kp S         &kp D         &kp F        &kp G        &mkp MCLK      &kp MINUS          &kp H          &kp J  &kp K      &kp L    &kp SEMI
+&mt A TAB         &kp S         &kp D         &kp F        &kp G        &mkp MCLK      &kp MINUS          &kp H          &kp J  &kp K      &kp L    &kp SEMI
 &mt LEFT_SHIFT Z  &kp X         &kp C         &kp V        &kp B        &kp COLON      &kp RIGHT_BRACKET  &kp N          &kp M  &kp COMMA  &kp DOT  &kp SLASH
 &kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt 2 LANG1  &lt 1 LANG2  &kp SPACE      &kp ENTER          &kp BACKSPACE                             &kp DEL
             >;
 
             sensor-bindings = <&encoder_msc_down_up>;
-
         };
 
         FUNCTION {
@@ -109,10 +111,10 @@
 
         NUM {
             bindings = <
-&kp MINUS                   &kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp PLUS                                                   &kp CARET         &kp AMPERSAND      &kp TILDE       &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS
-&kp SLASH                   &kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp ASTERISK  &kp LC(LA(KP_NUMBER_0))      &kp UNDERSCORE  &kp EXCLAMATION   &kp AT_SIGN        &kp HASH        &kp DOLLAR            &kp PERCENT
-&mt LEFT_SHIFT KP_NUMBER_0  &kp KP_NUMBER_1  &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp PERIOD    &kp EQUAL                    &trans          &kp LEFT_BRACKET  &kp RIGHT_BRACKET  &kp LEFT_BRACE  &kp RIGHT_BRACE       &kp BACKSLASH
-&trans                      &trans           &trans           &trans           &trans        &trans                       &trans          &trans                                                                     &kp PIPE
+&kp EXCLAMATION  &kp AT_SIGN    &kp HASH      &kp DOLLAR            &kp PERCENT                                                        &kp GRAVE          &kp KP_NUMBER_7  &kp KP_NUMBER_8  &kp KP_NUMBER_9  &kp EQUAL
+&kp CARET        &kp AMPERSAND  &kp ASTERISK  &kp LEFT_PARENTHESIS  &kp RIGHT_PARENTHESIS  &trans                    &kp LEFT_BRACKET  &kp RIGHT_BRACKET  &kp KP_NUMBER_4  &kp KP_NUMBER_5  &kp KP_NUMBER_6  &kp MINUS
+&kp LEFT_SHIFT   &trans         &trans        &trans                &trans                 &kp LEFT_PARENTHESIS      &kp RPAR          &kp KP_NUMBER_0    &kp KP_NUMBER_1  &kp KP_NUMBER_2  &kp KP_NUMBER_3  &kp BACKSLASH
+&trans           &trans         &trans        &trans                &trans                 &trans                    &trans            &trans                                                                &kp PIPE
             >;
         };
 
