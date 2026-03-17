@@ -81,7 +81,7 @@
 &kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt 2 LANG1  &lt 1 LANG2  &kp SPACE      &kp ENTER          &kp BACKSPACE                             &kp DEL
             >;
 
-            sensor-bindings = <&encoder_msc_down_up>
+            sensor-bindings = <&encoder_msc_down_up>;
         };
 
         FUNCTION {
@@ -118,7 +118,7 @@
 &trans          &trans                  &trans          &trans                   &trans   &trans      &trans  &trans                          &trans
             >;
 
-            sensor-bindings = <&encoder_msc_down_up>
+            sensor-bindings = <&encoder_msc_down_up>;
         };
 
         MOUSE {
