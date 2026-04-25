@@ -3,7 +3,8 @@
     "allow": [
       "Bash(xargs cat *)",
       "Bash(gh api *)",
-      "Bash(xargs -I{} sh -c 'gh api repos/cormoran/zmk-module-runtime-input-processor/contents/{} --jq \".name\" 2>/dev/null')"
+      "Bash(xargs -I{} sh -c 'gh api repos/cormoran/zmk-module-runtime-input-processor/contents/{} --jq \".name\" 2>/dev/null')",
+      "Bash(gh run *)"
     ]
   }
 }
