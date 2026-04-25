@@ -18,12 +18,16 @@
             ;
 };
 
+&zip_temp_layer {
+    require-prior-idle-ms = <500>;
+};
+
 / {
     trackball_listener {
         status = "okay";
         compatible = "zmk,input-listener";
         device = <&trackball>;
-        input-processors = <&mouse_runtime_input_processor>;
+        input-processors = <&zip_temp_layer 4 500 &mouse_runtime_input_processor>;
 
         scroller {
             layers = <5>;
