@@ -19,7 +19,7 @@
 };
 
 &zip_temp_layer {
-    require-prior-idle-ms = <500>;
+    require-prior-idle-ms = <100>;
 };
 
 / {
