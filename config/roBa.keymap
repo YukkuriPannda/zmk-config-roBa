@@ -23,9 +23,18 @@
             key-positions = <12 13>;
         };
 
+        // Windows 側: IME オフ + Windows ベースレイヤーへ復帰
         muhennkann {
             bindings = <&to_layer_0 INT_MUHENKAN>;
             key-positions = <11 10>;
+            layers = <0 2 3 4 5 6 7>;
+        };
+
+        // Mac 側: 英数 + Mac ベースレイヤーへ復帰
+        eisuu_mac {
+            bindings = <&to_layer_1 LANG2>;
+            key-positions = <11 10>;
+            layers = <1 8>;
         };
 
         double_quotation {
@@ -45,6 +54,24 @@
             #binding-cells = <1>;
             bindings = <&to 0 &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
             label = "TO_LAYER_0";
+        };
+
+        to_layer_1: to_layer_1 {
+            compatible = "zmk,behavior-macro-one-param";
+            #binding-cells = <1>;
+            bindings = <&to 1 &macro_param_1to1 &kp MACRO_PLACEHOLDER>;
+            label = "TO_LAYER_1";
+        };
+    };
+
+    // MAC(1) と FUNCTION(2) が同時に有効なとき MAC_FUNCTION(8) を上乗せする。
+    // 8 > 2 > 1 なので、MAC_FUNCTION の &trans は FUNCTION → MAC の順に解決される。
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+
+        mac_function {
+            if-layers = <1 2>;
+            then-layer = <8>;
         };
     };
 
@@ -73,12 +100,26 @@
             bindings = <
 &kp Q             &kp W         &kp E         &kp R        &kp T                                          &kp Y          &kp U  &kp I      &kp O    &kp P
 &kp A             &kp S         &kp D         &kp F        &kp G        &mkp MCLK      &kp MINUS          &kp H          &kp J  &kp K      &kp L    &kp SEMI
-&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V        &kp B        &lt 6 TAB      &kp RIGHT_BRACKET  &kp N          &kp M  &kp COMMA  &kp DOT  &kp SLASH
-&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt 2 LANG1  &lt 1 LANG2  &kp SPACE      &kp ENTER          &kp BACKSPACE                             &kp DEL
+&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V        &kp B        &lt 7 TAB      &kp RIGHT_BRACKET  &kp N          &kp M  &kp COMMA  &kp DOT  &kp SLASH
+&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt 3 LANG1  &lt 2 LANG2  &kp SPACE      &kp ENTER          &kp BACKSPACE                             &kp DEL
 &kp Q             &kp W         &kp E         &kp R        &kp T                                          &kp Y          &kp U  &kp I      &kp O    &kp P
 &kp A             &kp S         &kp D         &kp F        &kp G        &mkp MCLK      &kp MINUS          &kp H          &kp J  &kp K      &kp L    &kp SEMI
-&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V        &kp B        &lt 6 TAB      &kp RIGHT_BRACKET  &kp N          &kp M  &kp COMMA  &kp DOT  &kp SLASH
-&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt 2 LANG1  &lt 1 LANG2  &kp SPACE      &kp ENTER          &kp BACKSPACE                             &kp DEL
+&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V        &kp B        &lt 7 TAB      &kp RIGHT_BRACKET  &kp N          &kp M  &kp COMMA  &kp DOT  &kp SLASH
+&kp LCTRL         &kp LEFT_ALT  &kp LEFT_GUI  &lt 3 LANG1  &lt 2 LANG2  &kp SPACE      &kp ENTER          &kp BACKSPACE                             &kp DEL
+            >;
+
+            sensor-bindings = <&encoder_msc_down_up>;
+        };
+
+        // Mac 用ベースレイヤー。default_layer との差分は最下段の修飾キーのみで、
+        // LCTRL の位置に LEFT_GUI(Command) を置くことでコピー/ペースト等の指使いを揃える。
+        // IME キー(LANG1=かな / LANG2=英数)は元々 Mac 準拠なのでそのまま。
+        MAC {
+            bindings = <
+&kp Q             &kp W         &kp E         &kp R        &kp T                                          &kp Y          &kp U  &kp I      &kp O    &kp P
+&kp A             &kp S         &kp D         &kp F        &kp G        &mkp MCLK      &kp MINUS          &kp H          &kp J  &kp K      &kp L    &kp SEMI
+&mt LEFT_SHIFT Z  &kp X         &kp C         &kp V        &kp B        &lt 7 TAB      &kp RIGHT_BRACKET  &kp N          &kp M  &kp COMMA  &kp DOT  &kp SLASH
+&kp LEFT_GUI      &kp LEFT_ALT  &kp LCTRL     &lt 3 LANG1  &lt 2 LANG2  &kp SPACE      &kp ENTER          &kp BACKSPACE                             &kp DEL
             >;
 
             sensor-bindings = <&encoder_msc_down_up>;
@@ -139,12 +180,26 @@
             >;
         };
 
-        layer_6 {
+        // W = Windows ベース(0)、M = Mac ベース(1)。トグルではなく明示指定なので、
+        // 現在どちらのベースにいるか分からなくても必ず目的の状態に入れる。
+        SETTINGS {
             bindings = <
-&trans  &trans        &trans        &trans        &trans                           &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
+&trans  &to 0         &trans        &trans        &trans                           &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4
 &trans  &trans        &trans        &trans        &trans  &trans      &trans       &studio_unlock       &trans        &trans        &trans        &trans
-&trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &trans  &trans      &bootloader  &trans        &trans        &trans        &trans        &bt BT_CLR
+&trans  &kp NUMBER_1  &kp NUMBER_2  &kp NUMBER_3  &trans  &trans      &bootloader  &trans        &to 1         &trans        &trans        &bt BT_CLR
 &trans  &trans        &trans        &trans        &trans  &trans      &trans       &trans                                                  &bt BT_CLR_ALL
+            >;
+        };
+
+        // MAC(1) + FUNCTION(2) のときだけ conditional-layers 経由で有効になる差分レイヤー。
+        // &trans の位置は FUNCTION(2) の内容にフォールスルーするので、Mac で意味が変わる
+        // カーソル移動とスクリーンショットだけを上書きしている。
+        MAC_FUNCTION {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans                                    &trans        &trans        &trans  &trans         &trans
+&trans  &trans  &trans  &trans  &trans                  &trans  &trans    &kp LG(LEFT)  &kp LA(LEFT)  &trans  &kp LA(RIGHT)  &kp LG(RIGHT)
+&trans  &trans  &trans  &trans  &kp LG(LS(NUMBER_4))    &trans  &trans    &trans        &trans        &trans  &trans         &trans
+&trans  &trans  &trans  &trans  &trans                  &trans  &trans    &trans                                             &trans
             >;
         };
     };
