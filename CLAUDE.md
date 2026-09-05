@@ -30,7 +30,7 @@ gh run view <run-id> --log-failed   # ビルドエラー（devicetree / Kconfig�
 gh run download <run-id>
 ```
 
-キーマップ画像（`keymap-drawer/roBa.svg`、README に表示）は `draw.yml` が `workflow_dispatch` 限定なので **自動更新されない**。`config/roBa.keymap` を変更したら必要に応じて `gh workflow run draw.yml` を実行する（現状の svg / yaml は keymap の現行内容と一致していない）。なお `draw.yml` が参照する `keymap_drawer.config.yaml` はリポジトリに存在せず、無視される。
+キーマップ画像（`keymap-drawer/roBa.svg`、README に表示）は `draw.yml` が `config/roBa.keymap` などへの push で自動再描画し、結果を `[Draw]` コミットとしてリポジトリに書き戻す。手動実行は `gh workflow run draw.yml`。書き戻し先は `keymap-drawer/**` で、これは `build.yml` / `draw.yml` どちらのパスフィルタにも含まれないため再帰的な発火は起きない。なお `draw.yml` が参照する `keymap_drawer.config.yaml` はリポジトリに存在せず、無視される（キーの表示名をカスタムしたくなったらここに作る）。
 
 ## 構成の全体像
 
@@ -101,7 +101,7 @@ Windows・Mac ともUSB有線接続のため、`zmk_endpoint_changed` は発火�
 
 `muhennkann` combo（A+S）は `layers` で Windows 側 / Mac 側に出し分けている（`to_layer_0` + 無変換 / `to_layer_1` + 英数）。ただし combo の判定は「最上位の有効レイヤー」で行われるため、**MAC ベース中に NUM や MOUSE が有効な状態で A+S を押すと Windows 側の combo が発火して layer 0 に飛ぶ**。共有レイヤーからはどちらのベースにいたか判別できないための既知の制約。
 
-**重要な既存の癖**: `default_layer` / `FUNCTION` / `NUM` の `bindings` は **4行ブロックが2回、完全に同一の内容で重複**している（43キー×2 = 86 バインディング）。他のレイヤーは43個のみ。この3レイヤーを編集する場合は**両方のブロックを同じように直す**こと（片方だけ直すとどちらが効いているか分からない差分が残る）。
+**全レイヤーとも 43 バインディングちょうどで書くこと。** ZMK は余剰分を黙って捨てるためビルドは通ってしまうが、keymap-drawer は `config/roBa.json` の43キーに対して描画するので数が合わないと壊れる。実際 `default_layer` / `FUNCTION` / `NUM` には同一4行ブロックの重複（86個）が入り込んでいた時期がある。
 
 `combos` の `key-positions` は `default_transform` の map 上のインデックス（0始まり・43キー）を指す。
 

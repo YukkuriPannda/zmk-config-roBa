@@ -2,12 +2,13 @@ name: "Draw Keymap"
 
 on:
   workflow_dispatch:
-  # push時に自動で実行する場合は、以下のコメントアウトを外す
-  # push:
-  #   paths:
-  #     - "config/roBa.keymap"
-  #     - "keymap_drawer.config.yaml"
-  #     - "config/roBa.dtsi"
+  push:
+    paths:
+      - "config/roBa.keymap"
+      # レイアウト定義。keymap-drawer が読むのは dtsi ではなく json の方。
+      - "config/roBa.json"
+      - "keymap_drawer.config.yaml"
+      - "boards/shields/roBa/roBa.dtsi"
 
 jobs:
   draw:
