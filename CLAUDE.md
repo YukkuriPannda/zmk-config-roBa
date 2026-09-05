@@ -14,8 +14,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ローカルに west ワークスペース（`.west/`）は無く、**ビルドはすべて GitHub Actions 上で行う**。ローカルでの lint / テストは存在しない。
 
 ```bash
-# push でビルドが走る（トリガーは config/**, boards/**, build.yaml のみ。
-# .github/** や README.md だけの変更ではビルドされない）
+# push でビルドが走る（トリガーは config/**, boards/**, build.yaml,
+# src/**, CMakeLists.txt, Kconfig, zephyr/**, build.yml 自身）
+# README.md や draw.yml だけの変更ではビルドされない
 git push
 
 # 手動実行

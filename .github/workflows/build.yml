@@ -5,6 +5,15 @@ on:
       - config/**
       - boards/**
       - build.yaml
+      # 独自 Zephyr モジュール(src/battery_led.c など)。
+      # ここを漏らすと C コードだけを直した push がビルドされず、
+      # 検証したつもりで未検証のまま進んでしまう。
+      - src/**
+      - CMakeLists.txt
+      - Kconfig
+      - zephyr/**
+      # ビルド定義自体の変更でも走らせる
+      - .github/workflows/build.yml
 
 jobs:
   build:
