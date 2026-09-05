@@ -1,0 +1,23 @@
+config ROBA_BATTERY_LED
+	bool "Show the battery level on the XIAO onboard LED at startup"
+	depends on ZMK_BATTERY_REPORTING
+	help
+	  起動後に最初のバッテリー測定値を受け取った時点で、XIAO BLE の
+	  オンボード LED を残量に応じた色で一定時間だけ点灯させる。
+	  左右それぞれが自分側の電池残量を表示する。
+
+if ROBA_BATTERY_LED
+
+config ROBA_BATTERY_LED_DURATION_MS
+	int "How long the battery LED stays lit, in milliseconds"
+	default 3000
+
+config ROBA_BATTERY_LED_MID_PERCENT
+	int "At or above this percentage the LED is green"
+	default 60
+
+config ROBA_BATTERY_LED_LOW_PERCENT
+	int "Below this percentage the LED is red instead of yellow"
+	default 20
+
+endif # ROBA_BATTERY_LED
