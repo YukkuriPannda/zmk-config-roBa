@@ -69,6 +69,7 @@ input-processors = <&zip_temp_layer 5 500 &mouse_runtime_input_processor>;
 ```
 
 - ボールを動かすと **レイヤー5（MOUSE）に 500ms 一時遷移**する。`&zip_temp_layer` の `require-prior-idle-ms = <100>` は誤爆抑制用で、直近のタイピング後の意図しないレイヤー切替を防ぐ調整点。
+- `excluded-positions` は「ここに挙げた位置**以外**を押すとレイヤーを即解除する」という**反転した意味**を持つ。マウスボタン（9 15 18 19 20 21）だけを挙げてあり、他のキー（言語選択キー含む）を押すとマウスレイヤーを抜けてベースレイヤーに戻る。**このプロパティが空だと ZMK は `zmk_position_state_changed` の購読自体を行わず、キー入力での解除が一切効かなくなる**（タイムアウト待ちのみになる）ので、消してはいけない。
 - `scroller` ノードは **レイヤー6（SCROLL）** で XY をスクロールに変換（Y反転）。
 - `mouse_runtime_input_processor` / `scroll_runtime_input_processor` は ZMK Studio から実行時に感度等を変更するための fork 側機能。
 
