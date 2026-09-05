@@ -20,22 +20,33 @@
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
-#if !DT_NODE_EXISTS(DT_ALIAS(led0)) || !DT_NODE_EXISTS(DT_ALIAS(led2))
-#error "ROBA_BATTERY_LED needs the led0 (red) and led2 (green) aliases from the board"
+#if !DT_NODE_EXISTS(DT_ALIAS(led0)) || !DT_NODE_EXISTS(DT_ALIAS(led1)) ||                           \
+    !DT_NODE_EXISTS(DT_ALIAS(led2))
+#error "ROBA_BATTERY_LED needs the led0/led1/led2 aliases from the board"
 #endif
 
 /* XIAO BLE: led0=赤(P0.26) / led1=青(P0.30) / led2=緑(P0.06)。いずれも ACTIVE_LOW。
- * 赤と緑の同時点灯で黄色になるため、青は使わず3段階を表現する。 */
-static const struct gpio_dt_spec led_red = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
-static const struct gpio_dt_spec led_green = GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios);
+ * 残量表示には赤と緑しか使わない(同時点灯で黄色)が、青も必ず初期化すること。
+ * ZMK も DYA モジュールも LED を触らないため、設定しないまま放置するとブート
+ * ローダーが残した状態のまま点きっぱなしになり、赤と混ざって紫に見える。 */
+static const struct gpio_dt_spec leds[] = {
+    GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios),
+    GPIO_DT_SPEC_GET(DT_ALIAS(led1), gpios),
+    GPIO_DT_SPEC_GET(DT_ALIAS(led2), gpios),
+};
+
+#define LED_RED 0
+#define LED_BLUE 1
+#define LED_GREEN 2
 
 static bool shown;
 
 static void battery_led_off(struct k_work *work) {
     ARG_UNUSED(work);
 
-    gpio_pin_set_dt(&led_red, 0);
-    gpio_pin_set_dt(&led_green, 0);
+    for (size_t i = 0; i < ARRAY_SIZE(leds); i++) {
+        gpio_pin_set_dt(&leds[i], 0);
+    }
 }
 
 static K_WORK_DELAYABLE_DEFINE(battery_led_off_work, battery_led_off);
@@ -55,8 +66,8 @@ static int battery_led_listener(const zmk_event_t *eh) {
 
     LOG_INF("Battery at %u%%, lighting LED (red=%d green=%d)", soc, red, green);
 
-    gpio_pin_set_dt(&led_red, red);
-    gpio_pin_set_dt(&led_green, green);
+    gpio_pin_set_dt(&leds[LED_RED], red);
+    gpio_pin_set_dt(&leds[LED_GREEN], green);
     k_work_schedule(&battery_led_off_work, K_MSEC(CONFIG_ROBA_BATTERY_LED_DURATION_MS));
 
     return ZMK_EV_EVENT_BUBBLE;
@@ -66,21 +77,18 @@ ZMK_LISTENER(roba_battery_led, battery_led_listener);
 ZMK_SUBSCRIPTION(roba_battery_led, zmk_battery_state_changed);
 
 static int battery_led_init(void) {
-    if (!gpio_is_ready_dt(&led_red) || !gpio_is_ready_dt(&led_green)) {
-        LOG_ERR("Battery LED GPIOs are not ready");
-        return -ENODEV;
-    }
+    /* 残量表示に使わない青も含めて全て消灯状態に固定する。 */
+    for (size_t i = 0; i < ARRAY_SIZE(leds); i++) {
+        if (!gpio_is_ready_dt(&leds[i])) {
+            LOG_ERR("LED %u is not ready", (unsigned int)i);
+            return -ENODEV;
+        }
 
-    int ret = gpio_pin_configure_dt(&led_red, GPIO_OUTPUT_INACTIVE);
-    if (ret < 0) {
-        LOG_ERR("Failed to configure the red LED: %d", ret);
-        return ret;
-    }
-
-    ret = gpio_pin_configure_dt(&led_green, GPIO_OUTPUT_INACTIVE);
-    if (ret < 0) {
-        LOG_ERR("Failed to configure the green LED: %d", ret);
-        return ret;
+        int ret = gpio_pin_configure_dt(&leds[i], GPIO_OUTPUT_INACTIVE);
+        if (ret < 0) {
+            LOG_ERR("Failed to configure LED %u: %d", (unsigned int)i, ret);
+            return ret;
+        }
     }
 
     return 0;
