@@ -25,10 +25,17 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #error "ROBA_BATTERY_LED needs the led0/led1/led2 aliases from the board"
 #endif
 
-/* XIAO BLE: led0=赤(P0.26) / led1=青(P0.30) / led2=緑(P0.06)。いずれも ACTIVE_LOW。
- * 残量表示には赤と緑しか使わない(同時点灯で黄色)が、青も必ず初期化すること。
- * ZMK も DYA モジュールも LED を触らないため、設定しないまま放置するとブート
- * ローダーが残した状態のまま点きっぱなしになり、赤と混ざって紫に見える。 */
+/* XIAO BLE: led0=赤(P0.26) / led1=緑(P0.30) / led2=青(P0.06)。いずれも ACTIVE_LOW。
+ *
+ * 注意: ZMK がピン留めしている Zephyr 3.5 (zmkfirmware/zephyr v3.5.0+zmk-fixes) の
+ * boards/arm/seeeduino_xiao_ble/seeeduino_xiao_ble.dts は led1 を "Blue LED"、
+ * led2 を "Green LED" とラベルしているが、これは実機と逆。upstream Zephyr の
+ * boards/seeed/xiao_ble/xiao_ble_common.dtsi では led1="Green" / led2="Blue" に
+ * 修正済み。DTS の label を信じると緑のつもりで青が点く。
+ *
+ * 残量表示に使うのは赤と緑のみ(同時点灯で黄色)。青は使わないが、ZMK も DYA
+ * モジュールも LED を触らないため、初期化しないとブートローダーが残した状態の
+ * まま点きっぱなしになる。3つとも必ず消灯状態に固定すること。 */
 static const struct gpio_dt_spec leds[] = {
     GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios),
     GPIO_DT_SPEC_GET(DT_ALIAS(led1), gpios),
@@ -36,8 +43,8 @@ static const struct gpio_dt_spec leds[] = {
 };
 
 #define LED_RED 0
-#define LED_BLUE 1
-#define LED_GREEN 2
+#define LED_GREEN 1
+#define LED_BLUE 2
 
 static bool shown;
 

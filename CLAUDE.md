@@ -74,6 +74,12 @@ input-processors = <&zip_temp_layer 5 500 &mouse_runtime_input_processor>;
 - `scroller` ノードは **レイヤー6（SCROLL）** で XY をスクロールに変換（Y反転）。
 - `mouse_runtime_input_processor` / `scroll_runtime_input_processor` は ZMK Studio から実行時に感度等を変更するための fork 側機能。
 
+### 電池残量LED（`src/battery_led.c`）
+
+このリポジトリ自身が Zephyr モジュールとして C コードを持つ（`zephyr/module.yml` の `cmake` / `kconfig`）。起動後の最初の `zmk_battery_state_changed` で XIAO のオンボード LED を3秒だけ点灯させる。ZMK にも DYA モジュールにも LED を触るコードは無い（`DT_ALIAS led` の検索結果0件）ので、**初期化しない LED はブートローダーが残した状態のまま点きっぱなしになる**。3つとも必ず消灯状態に固定すること。
+
+**ピン留めしている Zephyr 3.5 のボード定義は緑と青のラベルが逆。** `seeeduino_xiao_ble.dts` は led1(P0.30)="Blue" / led2(P0.06)="Green" としているが実機と逆で、upstream Zephyr の `boards/seeed/xiao_ble/` では led1="Green" / led2="Blue" に修正済み。**DTS の `label` を信じてはいけない**（緑のつもりで青が点き、赤と混ざって紫になる）。
+
 ## キーマップ（`config/roBa.keymap`）を編集するとき
 
 レイヤー番号は定義順に 0〜8：
