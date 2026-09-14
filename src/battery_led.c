@@ -25,13 +25,9 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #error "ROBA_BATTERY_LED needs the led0/led1/led2 aliases from the board"
 #endif
 
-/* XIAO BLE: led0=赤(P0.26) / led1=緑(P0.30) / led2=青(P0.06)。いずれも ACTIVE_LOW。
- *
- * 注意: ZMK がピン留めしている Zephyr 3.5 (zmkfirmware/zephyr v3.5.0+zmk-fixes) の
- * boards/arm/seeeduino_xiao_ble/seeeduino_xiao_ble.dts は led1 を "Blue LED"、
- * led2 を "Green LED" とラベルしているが、これは実機と逆。upstream Zephyr の
- * boards/seeed/xiao_ble/xiao_ble_common.dtsi では led1="Green" / led2="Blue" に
- * 修正済み。DTS の label を信じると緑のつもりで青が点く。
+/* XIAO BLE (Zephyr 4.1): led0=赤(P0.26) / led1=緑(P0.30) / led2=青(P0.06)。
+ * いずれも ACTIVE_LOW。現行の xiao_ble ボード定義では DTS の label と実機の
+ * LED 色が一致する。
  *
  * 残量表示に使うのは赤と緑のみ(同時点灯で黄色)。青は使わないが、ZMK も DYA
  * モジュールも LED を触らないため、初期化しないとブートローダーが残した状態の
