@@ -17,4 +17,6 @@ on:
 
 jobs:
   build:
-    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+    # Zephyr 4.1 の修飾付きボード名 (xiao_ble//zmk) を成果物名へ安全に変換する版。
+    # main 追従ではなく、検証対象を再現できるようコミット SHA で固定する。
+    uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@641514a97db345f499dd50b0360e594270f008fe
