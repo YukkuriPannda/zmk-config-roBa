@@ -41,5 +41,8 @@ manifest:
     - name: zmk-feature-custom-settings
       remote: cormoran
       revision: c6a7fef3a3be3d3ace5de9a4b0628c6418cd1f3f
+    - name: zmk-feature-os-detection
+      remote: cormoran
+      revision: 3052679f645b8fc1997275c2eaa6b86bdd55ca01
   self:
     path: config

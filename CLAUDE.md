@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 概要
 
-分割キーボード **roBa**（43キー / seeeduino_xiao_ble ×2 / 右手側にPMW3610トラックボール、左手側にEC11ロータリーエンコーダ）の ZMK ユーザー設定リポジトリ。
+分割キーボード **roBa**（43キー / XIAO BLE ×2 / 右手側にPMW3610トラックボール、左手側にEC11ロータリーエンコーダ）の ZMK ユーザー設定リポジトリ。
 本体ファームウェアのソースは含まず、`config/west.yml` が指す ZMK 本体・モジュールを GitHub Actions が取得してビルドする。
 
 ## ビルドと確認
@@ -39,15 +39,15 @@ gh run download <run-id>
 
 | board | shield | 備考 |
 |---|---|---|
-| seeeduino_xiao_ble | `roBa_R` | セントラル。`studio-rpc-usb-uart` snippet 付き（ZMK Studio 用） |
-| seeeduino_xiao_ble | `roBa_L` | ペリフェラル |
-| seeeduino_xiao_ble | `settings_reset` | ZMK 標準のペアリング情報リセット用 |
+| `xiao_ble//zmk` | `roBa_R` | セントラル。`studio-rpc-usb-uart` snippet 付き（ZMK Studio 用） |
+| `xiao_ble//zmk` | `roBa_L` | ペリフェラル |
+| `xiao_ble//zmk` | `settings_reset` | ZMK 標準のペアリング情報リセット用 |
 
 ### ZMK 本体は upstream ではなく cormoran fork
 
-`config/west.yml` は **cormoran/zmk の `v0.3-branch+dya`** と DYA Studio 系モジュール
-（`zmk-module-ble-management` / `battery-history` / `settings-rpc` / `runtime-input-processor`、および `zmk-pmw3610-driver`）を取得する。
-`.github/workflows/build.yml` が参照する `zmkfirmware/zmk@v0.3` は**再利用ワークフローの取得元にすぎず、ビルドされる ZMK 本体ではない**。
+`config/west.yml` は **cormoran/zmk の `main+dya`** と DYA Studio 系モジュール
+（`zmk-module-ble-management` / `battery-history` / `settings-rpc` / `runtime-input-processor`、`zmk-feature-custom-settings`、`zmk-feature-os-detection`、および `zmk-pmw3610-driver`）をコミットSHA固定で取得する。
+`.github/workflows/build.yml` が参照する `zmkfirmware/zmk` のコミットSHAは**再利用ワークフローの取得元にすぎず、ビルドされる ZMK 本体ではない**。
 
 つまり `CONFIG_ZMK_RUNTIME_INPUT_PROCESSOR` や `CONFIG_ZMK_SETTINGS_RPC`、`&mouse_runtime_input_processor` などは
 **upstream ZMK には存在しない fork 側の機能**。これらの挙動やオプション名を調べるときは upstream のドキュメントではなく cormoran のリポジトリを見ること。
@@ -78,7 +78,7 @@ input-processors = <&zip_temp_layer 5 500 &mouse_runtime_input_processor>;
 
 このリポジトリ自身が Zephyr モジュールとして C コードを持つ（`zephyr/module.yml` の `cmake` / `kconfig`）。起動後の最初の `zmk_battery_state_changed` で XIAO のオンボード LED を3秒だけ点灯させる。ZMK にも DYA モジュールにも LED を触るコードは無い（`DT_ALIAS led` の検索結果0件）ので、**初期化しない LED はブートローダーが残した状態のまま点きっぱなしになる**。3つとも必ず消灯状態に固定すること。
 
-**ピン留めしている Zephyr 3.5 のボード定義は緑と青のラベルが逆。** `seeeduino_xiao_ble.dts` は led1(P0.30)="Blue" / led2(P0.06)="Green" としているが実機と逆で、upstream Zephyr の `boards/seeed/xiao_ble/` では led1="Green" / led2="Blue" に修正済み。**DTS の `label` を信じてはいけない**（緑のつもりで青が点き、赤と混ざって紫になる）。
+ピン留めしているZephyr 4.1では実機どおり、led0=赤(P0.26)、led1=緑(P0.30)、led2=青(P0.06)と定義されている。`src/battery_led.c`もこの物理色に合わせて3つすべてを初期化する。
 
 ## キーマップ（`config/roBa.keymap`）を編集するとき
 
@@ -102,9 +102,9 @@ input-processors = <&zip_temp_layer 5 500 &mouse_runtime_input_processor>;
 
 ### OS の切り替え
 
-`SETTINGS` レイヤーの **W = `&to 0`（Windows）/ M = `&to 1`（Mac）**。トグルではなく明示指定なので現在状態を知らなくても復帰できる（roBaには表示手段が無いため意図的にこの設計）。
+右側セントラルへのUSB接続時は`zmk-feature-os-detection`が列挙パターンから接続先OSを推定し、`src/os_layer_switch.c`がWindows/Linuxならlayer 0、macOS/iOSならlayer 1を選ぶ。Unknownでは現在のレイヤーを維持する。これはUSB列挙のヒューリスティックなので、KVMや一部ハブなど再列挙されない経路では自動切り替えを保証できない。
 
-Windows・Mac ともUSB有線接続のため、`zmk_endpoint_changed` は発火せず**接続先による自動切り替えはできない**。ZMKにOS検出機能（QMKの`os_detection`相当）も無い。
+`SETTINGS` レイヤーの **W = `&to 0`（Windows）/ M = `&to 1`（Mac）**はフォールバックとして残す。手動指定は次の認識済みOSイベントまで有効で、Unknown時にも確実に復帰できる。
 
 `muhennkann` combo（A+S）は `layers` で Windows 側 / Mac 側に出し分けている（`to_layer_0` + 無変換 / `to_layer_1` + 英数）。ただし combo の判定は「最上位の有効レイヤー」で行われるため、**MAC ベース中に NUM や MOUSE が有効な状態で A+S を押すと Windows 側の combo が発火して layer 0 に飛ぶ**。共有レイヤーからはどちらのベースにいたか判別できないための既知の制約。
 

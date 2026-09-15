@@ -21,3 +21,14 @@ config ROBA_BATTERY_LED_LOW_PERCENT
 	default 20
 
 endif # ROBA_BATTERY_LED
+
+config ROBA_OS_LAYER_SWITCH
+	bool "Select the base layer according to the USB-detected host OS"
+	depends on ZMK_OS_DETECTION_USB
+	help
+	  zmk-feature-os-detectionがUSB列挙から検出したOSに応じて、MACレイヤー
+	  (レイヤーID 1)をlocking付きで有効/無効にする。Windows・Linuxでは無効化
+	  (Windowsベースのまま)、macOS・iOSでは有効化(MACベース)する。Unknown・
+	  Androidでは何もしない(現在の選択を維持する)。SETTINGSレイヤーの手動
+	  `&to 0` / `&to 1` もlocking付きでレイヤー状態を更新するため、自動選択より
+	  後から手動操作すればそちらが優先される。
