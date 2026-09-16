@@ -73,6 +73,19 @@
             if-layers = <1 2>;
             then-layer = <8>;
         };
+
+        // NUM(3) と FUNCTION(2) の同時押しで ARROW(4) を有効化する。
+        num_function {
+            if-layers = <2 3>;
+            then-layer = <4>;
+        };
+
+        // Mac ベースで NUM(3) と FUNCTION(2) を同時押ししたとき、
+        // Windows 用 ARROW(4) の該当キーだけを Mac 用ショートカットで上書きする。
+        mac_num_function {
+            if-layers = <1 2 3>;
+            then-layer = <9>;
+        };
     };
 
     behaviors {
@@ -139,11 +152,14 @@
             >;
         };
 
+        // FUNCTION(2) + NUM(3): 右手でウィンドウ操作。
+        // U/I/O = 左半分/最大化/右半分、J/L = 前/次のアプリ、
+        // N/M = 左/右のモニターへ移動、, / / = 最小化/閉じる。
         ARROW {
             bindings = <
-&kp ESCAPE      &kp LC(LS(TAB))         &kp UP_ARROW    &kp LC(TAB)              &trans                       &trans  &trans  &trans  &trans  &trans
-&kp HOME        &kp LEFT_ARROW          &kp DOWN_ARROW  &kp RIGHT_ARROW          &kp END  &trans      &trans  &trans  &trans  &trans  &trans  &trans
-&kp LEFT_SHIFT  &kp LG(LS(LEFT_ARROW))  &trans          &kp LG(LS(RIGHT_ARROW))  &trans   &trans      &trans  &trans  &trans  &trans  &trans  &trans
+&kp ESCAPE      &kp LC(LS(TAB))         &kp UP_ARROW    &kp LC(TAB)              &trans                       &trans  &kp LG(LEFT_ARROW)  &kp LG(UP_ARROW)  &kp LG(RIGHT_ARROW)  &trans
+&kp HOME        &kp LEFT_ARROW          &kp DOWN_ARROW  &kp RIGHT_ARROW          &kp END  &trans      &trans  &trans            &kp LA(LS(TAB))   &trans  &kp LA(TAB)  &trans
+&kp LEFT_SHIFT  &kp LG(LS(LEFT_ARROW))  &trans          &kp LG(LS(RIGHT_ARROW))  &trans   &trans      &trans  &kp LG(LS(LEFT_ARROW))  &kp LG(LS(RIGHT_ARROW))  &kp LG(DOWN_ARROW)  &trans  &kp LA(F4)
 &trans          &trans                  &trans          &trans                   &trans   &trans      &trans  &trans                          &trans
             >;
 
@@ -188,6 +204,17 @@
 &trans  &trans  &trans  &trans  &trans                  &trans  &trans    &kp LG(LEFT)  &kp LA(LEFT)  &trans  &kp LA(RIGHT)  &kp LG(RIGHT)
 &trans  &trans  &trans  &trans  &kp LG(LS(NUMBER_4))    &trans  &trans    &trans        &trans        &trans  &trans         &trans
 &trans  &trans  &trans  &trans  &trans                  &trans  &trans    &trans                                             &trans
+            >;
+        };
+
+        // Mac + NUM(3) + FUNCTION(2): Windows 用ウィンドウ操作を Mac 用に置換。
+        // U/I/O と N/M は Rectangle の既定ショートカットを使う。
+        MAC_NUM_FUNCTION {
+            bindings = <
+&trans  &trans  &trans  &trans  &trans                      &trans  &kp LC(LA(LEFT_ARROW))  &kp LC(LA(ENTER))  &kp LC(LA(RIGHT_ARROW))  &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans  &kp LG(LS(TAB))  &trans  &kp LG(TAB)  &trans
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &kp LC(LA(LG(LEFT_ARROW)))  &kp LC(LA(LG(RIGHT_ARROW)))  &kp LG(M)  &trans  &kp LG(W)
+&trans  &trans  &trans  &trans  &trans  &trans      &trans  &trans                          &trans
             >;
         };
     };
