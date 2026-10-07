@@ -36,8 +36,10 @@
         device = <&trackball>;
         input-processors = <&zip_temp_layer 5 500 &mouse_runtime_input_processor>;
 
+        // FUNCTION(2) を押している間と SCROLL(6) ではボールをスクロールにする。
+        // 一致中は上の zip_temp_layer が走らないので MOUSE(5) に化けない。
         scroller {
-            layers = <6>;
+            layers = <2 6>;
             input-processors = 
                 <&zip_xy_to_scroll_mapper &scroll_runtime_input_processor>,
                 <&zip_scroll_transform INPUT_TRANSFORM_Y_INVERT>;

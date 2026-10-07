@@ -71,7 +71,7 @@ input-processors = <&zip_temp_layer 5 500 &mouse_runtime_input_processor>;
 
 - ボールを動かすと **レイヤー5（MOUSE）に 500ms 一時遷移**する。`&zip_temp_layer` の `require-prior-idle-ms = <100>` は誤爆抑制用で、直近のタイピング後の意図しないレイヤー切替を防ぐ調整点。
 - `excluded-positions` は「ここに挙げた位置**以外**を押すとレイヤーを即解除する」という**反転した意味**を持つ。マウスボタン（9 15 18 19 20 21）だけを挙げてあり、他のキー（言語選択キー含む）を押すとマウスレイヤーを抜けてベースレイヤーに戻る。**このプロパティが空だと ZMK は `zmk_position_state_changed` の購読自体を行わず、キー入力での解除が一切効かなくなる**（タイムアウト待ちのみになる）ので、消してはいけない。
-- `scroller` ノードは **レイヤー6（SCROLL）** で XY をスクロールに変換（Y反転）。
+- `scroller` ノードは **レイヤー2（FUNCTION。2を条件に含む4/8/9でも有効）と6（SCROLL）** で XY をスクロールに変換（Y反転）。override が一致している間は base の `zip_temp_layer` が走らないので、FUNCTION 中にボールを触っても MOUSE に化けない。
 - `mouse_runtime_input_processor` / `scroll_runtime_input_processor` は ZMK Studio から実行時に感度等を変更するための fork 側機能。
 
 ### 電池残量LED（`src/battery_led.c`）
@@ -96,7 +96,7 @@ input-processors = <&zip_temp_layer 5 500 &mouse_runtime_input_processor>;
 | 7 | `SETTINGS` | BT / bootloader / studio_unlock / OS切替 |
 | 8 | `MAC_FUNCTION` | conditional-layers `<1 2>` で自動有効化 |
 
-`&lt 2 LANG2` / `&lt 3 LANG1` / `&lt 7 TAB` や overlay 側の `zip_temp_layer 5` / `scroller layers = <6>` がこの番号に依存しているため、**レイヤーの並び替えは overlay も含めて影響する**。
+`&lt 2 LANG2` / `&lt 3 LANG1` / `&lt 7 TAB` や overlay 側の `zip_temp_layer 5` / `scroller layers = <2 6>` がこの番号に依存しているため、**レイヤーの並び替えは overlay も含めて影響する**。
 
 **代替ベースレイヤーは必ずオーバーレイ層より若い番号に置くこと。** ZMKは有効なレイヤーのうち最大番号から解決するため、`MAC` を末尾（例: 8）に置くと `FUNCTION`/`NUM`/`MOUSE`/`SETTINGS` が全て `MAC` に負けて機能しなくなる。特にトラックボールの `zip_temp_layer` が無効化されるので気付きにくい。`MAC` が 1 にあるのはこの制約による。
 
